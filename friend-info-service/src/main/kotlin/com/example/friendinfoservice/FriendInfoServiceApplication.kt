@@ -1,20 +1,30 @@
 package com.example.friendinfoservice
 
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.runApplication
-import org.springframework.context.annotation.Configuration
-import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories
-import org.springframework.web.reactive.config.EnableWebFlux
-import org.springframework.web.reactive.config.WebFluxConfigurer
-import org.springframework.web.reactive.result.method.annotation.ArgumentResolverConfigurer
+import com.fasterxml.jackson.datatype.jsr353.*
+import org.springframework.beans.factory.annotation.*
+import org.springframework.boot.*
+import org.springframework.boot.autoconfigure.*
+import org.springframework.context.annotation.*
+import org.springframework.data.mongodb.repository.config.*
+import org.springframework.http.codec.*
+import org.springframework.web.reactive.config.*
+
 
 @SpringBootApplication
 @EnableReactiveMongoRepositories
-@EnableWebFlux
-@Configuration
-class FriendInfoServiceApplication : WebFluxConfigurer {
-    override fun configureArgumentResolvers(configurer: ArgumentResolverConfigurer) {
-        configurer.addCustomResolver(JsonPatchArgumentResolver())
+class FriendInfoServiceApplication {
+    @Bean
+    fun webFluxConfigurer(@Autowired jsonPatchHttpMessageConverter: JsonPatchHttpMessageConverter): WebFluxConfigurer {
+        return object : WebFluxConfigurer {
+            override fun configureHttpMessageCodecs(configurer: ServerCodecConfigurer) {
+                configurer.customCodecs().register(jsonPatchHttpMessageConverter)
+            }
+        }
+    }
+
+    @Bean
+    fun jsr353Module(): JSR353Module {
+        return JSR353Module()
     }
 }
 

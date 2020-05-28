@@ -1,13 +1,16 @@
 package com.example.friendinfoservice
 
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.format.annotation.DateTimeFormat
-import org.springframework.http.HttpStatus
+import com.fasterxml.jackson.databind.*
+import com.github.fge.jsonpatch.*
+import com.github.fge.jsonpatch.JsonPatch
+import org.springframework.beans.factory.annotation.*
+import org.springframework.format.annotation.*
+import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
-import reactor.core.publisher.Mono
-import java.time.LocalDate
-import javax.json.JsonPatch
-import javax.validation.Valid
+import reactor.core.publisher.*
+import java.time.*
+import javax.json.*
+import javax.validation.*
 
 @RestController
 @RequestMapping("/friends")
@@ -15,6 +18,9 @@ class FriendController {
 
     @Autowired
     final lateinit var userFriendsRepository: UserFriendsRepository
+
+    @Autowired
+    final lateinit var objectMapper: ObjectMapper
 
     @GetMapping("/{id}")
     fun getAllFriends(@PathVariable("id") id: Long,
@@ -27,7 +33,9 @@ class FriendController {
             userFriendsRepository.findById(id)
         }
 
-        return foundUserFriends.defaultIfEmpty(UserFriends(id))
+        return foundUserFriends.defaultIfEmpty(UserFriends(id)).map{
+            it
+        }
     }
 
     @PutMapping("/{id}")
@@ -44,9 +52,12 @@ class FriendController {
     @PatchMapping("/{id}", consumes = ["application/json-patch+json"])
     fun addFriend(@PathVariable("id") id: Long,
                   @Valid @RequestBody jsonPatch: JsonPatch): Mono<UserFriends> {
+
         return userFriendsRepository.findById(id)
                 .map {
-                    it
+                    val userFriendsJson = objectMapper.convertValue(it, JsonNode::class.java)
+                    val patchedUserFriends = jsonPatch.apply(userFriendsJson)
+                    objectMapper.convertValue(patchedUserFriends, UserFriends::class.java)
                 }
                 .flatMap {
                     userFriendsRepository.save(it)
