@@ -23,10 +23,7 @@ import java.time.format.*
 class FriendControllerTest(@Autowired val client: WebTestClient,
                            @Autowired val repository: UserFriendsRepository,
                            @Autowired val objectMapper: ObjectMapper) {
-
     private final val today: LocalDate = LocalDate.now()
-
-
     private final val friendRelation2Id = 2L
     private final val friendRelation3Id = 3L
     private final val friendsSince2DaysAgo = mutableMapOf(
