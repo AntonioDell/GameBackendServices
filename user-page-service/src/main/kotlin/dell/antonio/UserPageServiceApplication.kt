@@ -1,4 +1,4 @@
-package dell.antonio.userpageservice
+package dell.antonio
 
 import org.springframework.boot.*
 import org.springframework.boot.autoconfigure.*
