@@ -18,7 +18,7 @@
       <module name="demo" target="11" />
       <module name="firend-info-service" target="11" />
       <module name="friend-info-service" target="11" />
-      <module name="game-backend-services" target="1.5" />
+      <module name="game-backend-services" target="1.8" />
       <module name="user-info-service" target="11" />
       <module name="user-page-service" target="11" />
       <module name="validation" target="11" />
