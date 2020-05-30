@@ -9,7 +9,7 @@
     <version>2.2.6.RELEASE</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
-  <groupId>com.example</groupId>
+  <groupId>dell.antonio</groupId>
   <artifactId>user-info-service</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>user-info-service</name>
@@ -64,10 +64,6 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.jetbrains.kotlin</groupId>
-      <artifactId>kotlin-stdlib-jdk8</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
@@ -87,7 +83,6 @@
           </args>
           <compilerPlugins>
             <plugin>spring</plugin>
-            <plugin>jpa</plugin>
           </compilerPlugins>
         </configuration>
         <dependencies>
