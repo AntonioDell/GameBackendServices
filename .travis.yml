@@ -1,1 +1,5 @@
 language: java
+addons:
+  sonarcloud:
+    organization: antoniodell
+    token: ${SONAR_TOKEN}
