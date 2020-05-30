@@ -2,14 +2,12 @@ package com.example.friendinfoservice
 
 import com.fasterxml.jackson.databind.*
 import com.github.fge.jsonpatch.*
-import com.github.fge.jsonpatch.JsonPatch
 import org.springframework.beans.factory.annotation.*
 import org.springframework.format.annotation.*
 import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.*
 import java.time.*
-import javax.json.*
 import javax.validation.*
 
 @RestController
@@ -33,7 +31,7 @@ class FriendController {
             userFriendsRepository.findById(id)
         }
 
-        return foundUserFriends.defaultIfEmpty(UserFriends(id)).map{
+        return foundUserFriends.defaultIfEmpty(UserFriends(id)).map {
             it
         }
     }

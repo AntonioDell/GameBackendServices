@@ -1,8 +1,8 @@
 package com.example.friendinfoservice
 
-import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.Document
-import java.time.LocalDate
+import org.springframework.data.annotation.*
+import org.springframework.data.mongodb.core.mapping.*
+import java.time.*
 
 @Document
 data class UserFriends(@Id val id: Long, val friends: MutableMap<Long, FriendRelation> = mutableMapOf())

@@ -1,15 +1,14 @@
 package com.example.friendinfoservice
 
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
-import org.springframework.data.domain.Example
-import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Flux
-import java.time.LocalDate
+import org.assertj.core.api.Assertions.*
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.extension.*
+import org.springframework.beans.factory.annotation.*
+import org.springframework.boot.test.autoconfigure.data.mongo.*
+import org.springframework.data.domain.*
+import org.springframework.test.context.junit.jupiter.*
+import reactor.core.publisher.*
+import java.time.*
 
 
 @DataMongoTest
@@ -25,13 +24,11 @@ class UserFriendsRepositoryTest(@Autowired val repository: UserFriendsRepository
 
     @BeforeEach
     fun setUp() {
-
         repository.deleteAll().block()
-        repository
-                .saveAll(Flux.just(UserFriends(id1, mutableMapOf(
-                        relation1.friendId to relation1,
-                        relation2.friendId to relation2,
-                        relation3.friendId to relation3))))
+        repository.saveAll(Flux.just(UserFriends(id1, mutableMapOf(
+                relation1.friendId to relation1,
+                relation2.friendId to relation2,
+                relation3.friendId to relation3))))
                 .then()
                 .block()
     }
