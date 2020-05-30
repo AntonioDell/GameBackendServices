@@ -50,6 +50,7 @@ class FriendController {
     @PatchMapping("/{id}", consumes = ["application/json-patch+json"])
     fun addFriend(@PathVariable("id") id: Long,
                   @Valid @RequestBody jsonPatch: JsonPatch): Mono<UserFriends> {
+
         return userFriendsRepository.findById(id)
                 .map {
                     val userFriendsJson = objectMapper.convertValue(it, JsonNode::class.java)
