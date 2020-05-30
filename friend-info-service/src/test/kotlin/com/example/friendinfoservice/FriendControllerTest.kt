@@ -1,6 +1,8 @@
 package com.example.friendinfoservice
 
 import com.fasterxml.jackson.databind.*
+import com.github.fge.jackson.jsonpointer.*
+import com.github.fge.jsonpatch.*
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.*
@@ -26,9 +28,10 @@ class FriendControllerTest(@Autowired val client: WebTestClient,
 
 
     private final val friendRelation2Id = 2L
+    private final val friendRelation3Id = 3L
     private final val friendsSince2DaysAgo = mutableMapOf(
             friendRelation2Id to FriendRelation(friendRelation2Id, today.minusDays(1)),
-            3L to FriendRelation(3L, today.minusDays(2)))
+            friendRelation3Id to FriendRelation(friendRelation3Id, today.minusDays(2)))
 
     private final val userWithoutFriends = UserFriends(1L)
     private final val userWithMultipleFriends = UserFriends(
@@ -136,22 +139,14 @@ class FriendControllerTest(@Autowired val client: WebTestClient,
     @Nested
     inner class UpdateUserFriends {
 
-        private fun createJsonPatch(op: String, path: String, value: String): String {
-            val formattedValue = if (value[0] == '{' || value[0] == '[') value else "\"$value\""
-            return """
-                [{"op": "$op", "path": "$path", "value": $formattedValue}]
-            """.trimIndent()
-        }
-
         @Test
         fun `it adds a new friend to an existing repository entity`() {
             val newFriendId = 999L
             val friendRelationToAdd = FriendRelation(newFriendId, today)
 
-            val addFriendPatch = createJsonPatch(
-                    "add",
-                    "/friends/$newFriendId",
-                    objectMapper.convertValue(friendRelationToAdd, JsonNode::class.java).toPrettyString())
+            val addFriendPatch = JsonPatch(listOf(AddOperation(
+                    JsonPointer("/friends/$newFriendId"),
+                    objectMapper.convertValue(friendRelationToAdd, JsonNode::class.java))))
 
             client.patch().uri("/friends/${userWithMultipleFriends.id}")
                     .contentType(MediaType.valueOf("application/json-patch+json"))
@@ -164,10 +159,9 @@ class FriendControllerTest(@Autowired val client: WebTestClient,
         @Test
         fun `it modifies an existing friend inside an entity and returns the entity`() {
             val modifiedDate = LocalDate.now().plusMonths(1)
-            val modifySincePatch = createJsonPatch(
-                    "replace",
-                    "/friends/${friendRelation2Id}/since",
-                    modifiedDate.format(DateTimeFormatter.ISO_DATE))
+            val modifySincePatch = JsonPatch(listOf(ReplaceOperation(
+                    JsonPointer("/friends/${friendRelation2Id}/since"),
+                    objectMapper.convertValue(modifiedDate, JsonNode::class.java))))
 
             val expectedFriends = userWithMultipleFriends.friends.toMutableMap()
             expectedFriends.replace(friendRelation2Id, FriendRelation(friendRelation2Id, modifiedDate))
@@ -175,6 +169,42 @@ class FriendControllerTest(@Autowired val client: WebTestClient,
             client.patch().uri("/friends/${userWithMultipleFriends.id}")
                     .contentType(MediaType.valueOf("application/json-patch+json"))
                     .bodyValue(modifySincePatch)
+                    .exchange()
+                    .expectBody<UserFriends>()
+                    .isEqualTo(UserFriends(userWithMultipleFriends.id, expectedFriends))
+        }
+
+        @Test
+        fun `it removes an existing friend inside an entity and returns the entity`() {
+            val removeJsonPatch = JsonPatch(listOf(RemoveOperation(
+                    JsonPointer("/friends/$friendRelation2Id"))))
+            val expectedFriends = userWithMultipleFriends.friends.toMutableMap()
+            expectedFriends.remove(friendRelation2Id)
+
+            client.patch().uri("/friends/${userWithMultipleFriends.id}")
+                    .contentType(MediaType.valueOf("application/json-patch+json"))
+                    .bodyValue(removeJsonPatch)
+                    .exchange()
+                    .expectBody<UserFriends>()
+                    .isEqualTo(UserFriends(userWithMultipleFriends.id, expectedFriends))
+        }
+
+        @Test
+        fun `it allows for multiple json patch operations to be chained`() {
+            val modifiedDate = LocalDate.now().plusMonths(1)
+            val multiplePatchOperations = JsonPatch(listOf(
+                    RemoveOperation(JsonPointer("/friends/$friendRelation2Id")),
+                    ReplaceOperation(
+                            JsonPointer("/friends/$friendRelation3Id/since"),
+                            objectMapper.convertValue(modifiedDate, JsonNode::class.java))))
+
+            val expectedFriends = userWithMultipleFriends.friends.toMutableMap()
+            expectedFriends.remove(friendRelation2Id)
+            expectedFriends.replace(friendRelation3Id, FriendRelation(friendRelation3Id, modifiedDate))
+
+            client.patch().uri("/friends/${userWithMultipleFriends.id}")
+                    .contentType(MediaType.valueOf("application/json-patch+json"))
+                    .bodyValue(multiplePatchOperations)
                     .exchange()
                     .expectBody<UserFriends>()
                     .isEqualTo(UserFriends(userWithMultipleFriends.id, expectedFriends))
