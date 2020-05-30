@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/AntonioDell/GameBackendServices.svg?branch=master)](https://travis-ci.org/AntonioDell/GameBackendServices)
+[![Build Status (dev)](https://travis-ci.org/AntonioDell/GameBackendServices.svg?branch=dev)](https://travis-ci.org/AntonioDell/GameBackendServices)
 # GameBackendServices
 My shot at creating a collection of microservices used to manage a games business logic (users, friends, saved games, ...). Let's see how deep the rabbit hole goes
 
