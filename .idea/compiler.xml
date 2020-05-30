@@ -6,7 +6,6 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="demo" />
         <module name="user-page-service" />
         <module name="friend-info-service" />
         <module name="validation" />
@@ -18,7 +17,7 @@
       <module name="demo" target="11" />
       <module name="firend-info-service" target="11" />
       <module name="friend-info-service" target="11" />
-      <module name="game-backend-services" target="1.8" />
+      <module name="game-backend-services" target="11" />
       <module name="user-info-service" target="11" />
       <module name="user-page-service" target="11" />
       <module name="validation" target="11" />
