@@ -1,6 +1,7 @@
 package dell.antonio.userpageservice
 
 import dell.antonio.model.*
+import org.springframework.beans.factory.annotation.*
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -13,9 +14,9 @@ import java.util.*
 
 @RestController
 @RequestMapping("/user-page")
-@EnableWebFlux
-class UserPageController(val webClientBuilder: WebClient.Builder) {
-
+class UserPageController {
+    @Autowired
+    final lateinit var webClientBuilder: WebClient.Builder
 
     @GetMapping("/{userId}")
     fun getUserPage(@PathVariable("userId") userId: UUID): UserPage {
