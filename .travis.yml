@@ -4,4 +4,5 @@ addons:
     organization: antoniodell
     token: ${SONAR_TOKEN}
 script:
-  - sonar-scanner
+  - mvn clean verify sonar:sonar -Pcoverage
+
