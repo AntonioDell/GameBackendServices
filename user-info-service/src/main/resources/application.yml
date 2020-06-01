@@ -1,2 +1,7 @@
-server:
-  port: 8101
+server.port: 8101
+
+
+spring.data.mongodb.port: 27017
+spring.data.mongodb.host: localhost
+spring.data.mongodb.database: mongodb
+spring.data.mongodb.version: 4.0.2
