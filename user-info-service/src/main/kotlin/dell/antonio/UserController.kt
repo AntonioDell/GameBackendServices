@@ -13,22 +13,9 @@ class UserController(@Autowired val repository: UserRepository) {
             repository.findById(id).defaultIfEmpty(User(id))
 
 
-    @GetMapping("/")
+    @GetMapping
     fun getAllUsers() =
-            mapOf("list" to listOf(
-                    User(1, "Mr. A", Address(
-                            "A-Team-Street",
-                            "1",
-                            "11111",
-                            "A-Team-City")),
-                    User(2, "Mr. B", Address(
-                            "A-Team-Street",
-                            "2",
-                            "11111",
-                            "A-Team-City")),
-                    User(3, "Mr. C", Address(
-                            "A-Team-Street",
-                            "3",
-                            "11111",
-                            "A-Team-City"))))
+            repository.findAll()
+                    .collectList()
+                    .map { mapOf("list" to it) }
 }

@@ -12,52 +12,44 @@ import javax.validation.*
 
 @RestController
 @RequestMapping("/friends")
-class FriendController {
+class FriendController(@Autowired val userFriendsRepository: UserFriendsRepository,
+                       @Autowired val objectMapper: ObjectMapper) {
 
-    @Autowired
-    final lateinit var userFriendsRepository: UserFriendsRepository
-
-    @Autowired
-    final lateinit var objectMapper: ObjectMapper
 
     @GetMapping("/{id}")
     fun getAllFriends(@PathVariable("id") id: Long,
                       @RequestParam("friendsSince")
-                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) friendsSince: LocalDate? = null)
-            : Mono<UserFriends> {
-        val foundUserFriends = if (friendsSince != null) {
-            userFriendsRepository.findLatestFriendsSince(id, friendsSince)
-        } else {
-            userFriendsRepository.findById(id)
-        }
+                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) friendsSince: LocalDate? = null) =
+            if (friendsSince != null) {
+                userFriendsRepository.findLatestFriendsSince(id, friendsSince)
+            } else {
+                userFriendsRepository.findById(id)
+            }.defaultIfEmpty(UserFriends(id)).map {
+                it
+            }
 
-        return foundUserFriends.defaultIfEmpty(UserFriends(id)).map {
-            it
-        }
-    }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     fun createUserFriends(@PathVariable("id") id: Long,
-                          @Valid @RequestBody userFriends: UserFriends): Mono<UserFriends> {
-        return if (userFriends.id != id) {
-            userFriendsRepository.save(UserFriends(id, userFriends.friends))
-        } else {
-            userFriendsRepository.save(userFriends)
-        }
-    }
+                          @Valid @RequestBody userFriends: UserFriends): Mono<UserFriends> =
+            if (userFriends.id != id) {
+                userFriendsRepository.save(UserFriends(id, userFriends.friends))
+            } else {
+                userFriendsRepository.save(userFriends)
+            }
+
 
     @PatchMapping("/{id}", consumes = ["application/json-patch+json"])
     fun addFriend(@PathVariable("id") id: Long,
-                  @Valid @RequestBody jsonPatch: JsonPatch): Mono<UserFriends> {
-        return userFriendsRepository.findById(id)
-                .map {
-                    val userFriendsJson = objectMapper.convertValue(it, JsonNode::class.java)
-                    val patchedUserFriends = jsonPatch.apply(userFriendsJson)
-                    objectMapper.convertValue(patchedUserFriends, UserFriends::class.java)
-                }
-                .flatMap {
-                    userFriendsRepository.save(it)
-                }
-    }
+                  @Valid @RequestBody jsonPatch: JsonPatch): Mono<UserFriends> = userFriendsRepository
+            .findById(id)
+            .map {
+                val userFriendsJson = objectMapper.convertValue(it, JsonNode::class.java)
+                val patchedUserFriends = jsonPatch.apply(userFriendsJson)
+                objectMapper.convertValue(patchedUserFriends, UserFriends::class.java)
+            }
+            .flatMap {
+                userFriendsRepository.save(it)
+            }
 }
