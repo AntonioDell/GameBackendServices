@@ -2,11 +2,15 @@ package dell.antonio
 
 import com.fasterxml.jackson.databind.*
 import dell.antonio.model.*
+import org.assertj.core.api.Assertions.*
+import org.bson.types.*
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.*
 import org.springframework.beans.factory.annotation.*
 import org.springframework.boot.test.autoconfigure.web.reactive.*
 import org.springframework.boot.test.context.*
+import org.springframework.data.domain.*
+import org.springframework.http.*
 import org.springframework.test.context.junit.jupiter.*
 import org.springframework.test.web.reactive.server.*
 import java.time.*
@@ -20,13 +24,14 @@ class UserControllerTest(@Autowired val client: WebTestClient,
                          @Autowired val repository: UserRepository,
                          @Autowired val objectMapper: ObjectMapper) {
 
-    val user1Id = 1L
+    val user1Id = ObjectId()
+    val user2Id = ObjectId()
     val user1 = User(
             user1Id,
             "Uncle Bob",
             Address("Teststreet", "1a", "1337", "Testcity"))
     val user2 = User(
-            2,
+            user2Id,
             "Terry Crews",
             Address("Testlane", "1", "7331", "Testvillage"))
 
@@ -50,18 +55,19 @@ class UserControllerTest(@Autowired val client: WebTestClient,
 
         @Test
         fun `it returns a default entry with the given id, when no entry is found`() {
-            client.get().uri("/users/999")
+            val defaultId = ObjectId()
+            client.get().uri("/users/" + defaultId)
                     .exchange()
                     .expectStatus().isOk
                     .expectBody<User>()
-                    .isEqualTo(User(999))
+                    .isEqualTo(User(defaultId))
         }
     }
 
     @Nested
     inner class GetAllUsers {
         @Test
-        fun `it returns all entites in a repository`() {
+        fun `it returns all entities in a repository`() {
             val allUsersJson = objectMapper.convertValue(
                     mapOf("list" to listOf(user1, user2)),
                     JsonNode::class.java)
@@ -69,8 +75,8 @@ class UserControllerTest(@Autowired val client: WebTestClient,
             client.get().uri("/users")
                     .exchange()
                     .expectStatus().isOk
-                    .expectBody<String>()
-                    .isEqualTo(allUsersJson.toString())
+                    .expectBody<JsonNode>()
+                    .isEqualTo(allUsersJson)
         }
 
         @Test
@@ -84,6 +90,54 @@ class UserControllerTest(@Autowired val client: WebTestClient,
                     .expectStatus().isOk
                     .expectBody<JsonNode>()
                     .isEqualTo(emptyMapJson)
+        }
+    }
+
+    @Nested
+    inner class CreateUser {
+        @Test
+        fun `it adds the given new user to the repository`() {
+            val addedUserName = "Added Username"
+            val newUser = User(null, addedUserName,
+                    Address("TS", "1", "999", "TC"))
+
+            client.put().uri("/users")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(newUser)
+                    .exchange()
+                    .expectStatus().isOk
+            assertThat(repository.findOne(Example.of(
+                    User(null, addedUserName),
+                    ExampleMatcher.matchingAny())).block()!!.userName)
+                    .isEqualTo(addedUserName)
+        }
+
+        @Test
+        fun `it returns the given new user with an id`() {
+            val newUser = User(null, "Added Username",
+                    Address("TS", "1", "999", "TC"))
+
+            val returnedUser = client.put().uri("/users")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(newUser)
+                    .exchange()
+                    .expectBody<User>()
+                    .returnResult()
+                    .responseBody
+            assertThat(returnedUser!!.userName).isEqualTo(newUser.userName)
+            assertThat(returnedUser!!.id).isNotNull()
+        }
+
+        @Test
+        fun `it returns a bad request if userName is empty`() {
+            val newUser = User(null, "",
+                    Address("TS", "1", "999", "TC"))
+            client.put().uri("/users")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(newUser)
+                    .exchange()
+                    .expectStatus().isBadRequest
+
         }
     }
 }
