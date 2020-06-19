@@ -2,6 +2,7 @@ package com.example.friendinfoservice
 
 import com.fasterxml.jackson.databind.*
 import com.github.fge.jsonpatch.*
+import org.bson.types.*
 import org.springframework.beans.factory.annotation.*
 import org.springframework.format.annotation.*
 import org.springframework.http.*
@@ -17,7 +18,7 @@ class FriendController(@Autowired val userFriendsRepository: UserFriendsReposito
 
 
     @GetMapping("/{id}")
-    fun getAllFriends(@PathVariable("id") id: Long,
+    fun getAllFriends(@PathVariable("id") id: ObjectId,
                       @RequestParam("friendsSince")
                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) friendsSince: LocalDate? = null) =
             if (friendsSince != null) {
@@ -31,7 +32,7 @@ class FriendController(@Autowired val userFriendsRepository: UserFriendsReposito
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    fun createUserFriends(@PathVariable("id") id: Long,
+    fun createUserFriends(@PathVariable("id") id: ObjectId,
                           @Valid @RequestBody userFriends: UserFriends): Mono<UserFriends> =
             if (userFriends.id != id) {
                 userFriendsRepository.save(UserFriends(id, userFriends.friends))
@@ -41,7 +42,7 @@ class FriendController(@Autowired val userFriendsRepository: UserFriendsReposito
 
 
     @PatchMapping("/{id}", consumes = ["application/json-patch+json"])
-    fun addFriend(@PathVariable("id") id: Long,
+    fun addFriend(@PathVariable("id") id: ObjectId,
                   @Valid @RequestBody jsonPatch: JsonPatch): Mono<UserFriends> = userFriendsRepository
             .findById(id)
             .map {

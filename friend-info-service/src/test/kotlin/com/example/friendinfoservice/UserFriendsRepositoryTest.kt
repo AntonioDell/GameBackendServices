@@ -1,6 +1,7 @@
 package com.example.friendinfoservice
 
 import org.assertj.core.api.Assertions.*
+import org.bson.types.*
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.*
 import org.springframework.beans.factory.annotation.*
@@ -14,13 +15,13 @@ import java.time.*
 @DataMongoTest
 @ExtendWith(SpringExtension::class)
 class UserFriendsRepositoryTest(@Autowired val repository: UserFriendsRepository) {
-    private val id1 = 1L
+    private val id1 = ObjectId()
 
     private val today = LocalDate.now()
 
-    private val relation1 = FriendRelation(2, today.minusDays(1))
-    private val relation2 = FriendRelation(3, today.minusDays(2))
-    private val relation3 = FriendRelation(4, today.minusDays(3))
+    private val relation1 = FriendRelation(ObjectId(), today.minusDays(1))
+    private val relation2 = FriendRelation(ObjectId(), today.minusDays(2))
+    private val relation3 = FriendRelation(ObjectId(), today.minusDays(3))
 
     @BeforeEach
     fun setUp() {

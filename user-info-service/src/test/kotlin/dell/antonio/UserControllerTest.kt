@@ -24,8 +24,8 @@ class UserControllerTest(@Autowired val client: WebTestClient,
                          @Autowired val repository: UserRepository,
                          @Autowired val objectMapper: ObjectMapper) {
 
-    val user1Id = ObjectId()
-    val user2Id = ObjectId()
+    final val user1Id = ObjectId()
+    private final val user2Id = ObjectId()
     val user1 = User(
             user1Id,
             "Uncle Bob",
@@ -38,7 +38,7 @@ class UserControllerTest(@Autowired val client: WebTestClient,
     @BeforeEach
     fun setup() {
         repository.deleteAll()
-                .thenMany<User>(repository.saveAll(listOf(user1, user2)))
+                .thenMany(repository.saveAll(listOf(user1, user2)))
                 .blockLast(Duration.ofSeconds(10))
     }
 
@@ -56,7 +56,7 @@ class UserControllerTest(@Autowired val client: WebTestClient,
         @Test
         fun `it returns a default entry with the given id, when no entry is found`() {
             val defaultId = ObjectId()
-            client.get().uri("/users/" + defaultId)
+            client.get().uri("/users/$defaultId")
                     .exchange()
                     .expectStatus().isOk
                     .expectBody<User>()
@@ -84,7 +84,7 @@ class UserControllerTest(@Autowired val client: WebTestClient,
             repository.deleteAll().block()
             val emptyMapJson = objectMapper.convertValue(
                     mapOf("list" to listOf<User>()),
-                    JsonNode::class.java);
+                    JsonNode::class.java)
             client.get().uri("/users")
                     .exchange()
                     .expectStatus().isOk
@@ -125,7 +125,7 @@ class UserControllerTest(@Autowired val client: WebTestClient,
                     .returnResult()
                     .responseBody
             assertThat(returnedUser!!.userName).isEqualTo(newUser.userName)
-            assertThat(returnedUser!!.id).isNotNull()
+            assertThat(returnedUser.id).isNotNull()
         }
 
         @Test

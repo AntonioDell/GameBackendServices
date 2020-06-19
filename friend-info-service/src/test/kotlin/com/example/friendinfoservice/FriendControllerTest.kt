@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.*
 import com.github.fge.jackson.jsonpointer.*
 import com.github.fge.jsonpatch.*
 import org.assertj.core.api.Assertions.*
+import org.bson.types.*
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.*
 import org.springframework.beans.factory.annotation.*
@@ -24,16 +25,17 @@ class FriendControllerTest(@Autowired val client: WebTestClient,
                            @Autowired val repository: UserFriendsRepository,
                            @Autowired val objectMapper: ObjectMapper) {
     private final val today: LocalDate = LocalDate.now()
-    private final val friendRelation2Id = 2L
-    private final val friendRelation3Id = 3L
+    private final val friendRelation2Id = ObjectId()
+    private final val friendRelation3Id = ObjectId()
+    private final val friendRelation4Id = ObjectId()
     private final val friendsSince2DaysAgo = mutableMapOf(
             friendRelation2Id to FriendRelation(friendRelation2Id, today.minusDays(1)),
             friendRelation3Id to FriendRelation(friendRelation3Id, today.minusDays(2)))
 
-    private final val userWithoutFriends = UserFriends(1L)
+    private final val userWithoutFriends = UserFriends(ObjectId())
     private final val userWithMultipleFriends = UserFriends(
-            11L,
-            mutableMapOf(4L to FriendRelation(4L, today.minusDays(3)))
+            ObjectId(),
+            mutableMapOf(friendRelation4Id to FriendRelation(friendRelation4Id, today.minusDays(3)))
                     .also { it.putAll(friendsSince2DaysAgo) })
 
     @BeforeEach
@@ -76,7 +78,7 @@ class FriendControllerTest(@Autowired val client: WebTestClient,
 
         @Test
         fun `it returns an empty entry with the given id, when the given id is unknown`() {
-            val unknownId = 1000L
+            val unknownId = ObjectId()
 
             client.get().uri("/friends/$unknownId")
                     .exchange()
@@ -92,10 +94,11 @@ class FriendControllerTest(@Autowired val client: WebTestClient,
 
         @Test
         fun `it returns a given entity`() {
-            val newId = 1000L
+            val newId = ObjectId()
+            val newId2 = ObjectId()
             val newUserFriends = UserFriends(
                     newId,
-                    mutableMapOf(1001L to FriendRelation(1001L, today)))
+                    mutableMapOf(newId2 to FriendRelation(newId2, today)))
 
             client.put().uri("/friends/$newId")
                     .bodyValue(newUserFriends)
@@ -106,10 +109,11 @@ class FriendControllerTest(@Autowired val client: WebTestClient,
 
         @Test
         fun `it adds the given entity to the repository`() {
-            val newId = 1000L
+            val newId = ObjectId()
+            val newId2 = ObjectId()
             val newUserFriends = UserFriends(
                     newId,
-                    mutableMapOf(1001L to FriendRelation(1001L, today)))
+                    mutableMapOf(newId2 to FriendRelation(newId2, today)))
 
             client.put().uri("/friends/$newId")
                     .bodyValue(newUserFriends)
@@ -119,9 +123,11 @@ class FriendControllerTest(@Autowired val client: WebTestClient,
 
         @Test
         fun `it returns the entity with the URI id, when URI id and entity id don't match`() {
-            val uriId = 1000L
-            val friendRelations = mutableMapOf(1001L to FriendRelation(1001L, today))
-            val requestBody = UserFriends(2000L, friendRelations)
+            val uriId = ObjectId()
+            val newId2 = ObjectId()
+
+            val friendRelations = mutableMapOf(newId2 to FriendRelation(newId2, today))
+            val requestBody = UserFriends(ObjectId(), friendRelations)
 
             client.put().uri("/friends/$uriId")
                     .bodyValue(requestBody)
@@ -138,7 +144,7 @@ class FriendControllerTest(@Autowired val client: WebTestClient,
 
         @Test
         fun `it adds a new friend to an existing repository entity`() {
-            val newFriendId = 999L
+            val newFriendId = ObjectId();
             val friendRelationToAdd = FriendRelation(newFriendId, today)
 
             val addFriendPatch = JsonPatch(listOf(AddOperation(

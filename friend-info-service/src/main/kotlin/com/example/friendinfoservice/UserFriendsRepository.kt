@@ -1,5 +1,6 @@
 package com.example.friendinfoservice
 
+import org.bson.types.*
 import org.springframework.data.mongodb.repository.*
 import org.springframework.stereotype.*
 import reactor.core.publisher.*
@@ -7,7 +8,7 @@ import java.time.*
 
 
 @Repository
-interface UserFriendsRepository : ReactiveMongoRepository<UserFriends, Long> {
+interface UserFriendsRepository : ReactiveMongoRepository<UserFriends, ObjectId> {
 
     @Aggregation(
             "{\$match: {_id : ?0}}",
@@ -24,5 +25,5 @@ interface UserFriendsRepository : ReactiveMongoRepository<UserFriends, Long> {
                     "}" +
                     "}",
             "{\$addFields: {friends: {\$arrayToObject: '\$friends'}}}")
-    fun findLatestFriendsSince(id: Long, since: LocalDate): Mono<UserFriends>
+    fun findLatestFriendsSince(id: ObjectId, since: LocalDate): Mono<UserFriends>
 }

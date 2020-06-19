@@ -1,10 +1,15 @@
 package com.example.friendinfoservice
 
+import com.fasterxml.jackson.databind.annotation.*
+import com.fasterxml.jackson.databind.ser.std.*
+import org.bson.types.*
 import org.springframework.data.annotation.*
 import org.springframework.data.mongodb.core.mapping.*
 import java.time.*
 
 @Document
-data class UserFriends(@Id val id: Long, val friends: MutableMap<Long, FriendRelation> = mutableMapOf())
+data class UserFriends(@JsonSerialize(using = ToStringSerializer::class) @Id val id: ObjectId,
+                       val friends: MutableMap<ObjectId, FriendRelation> = mutableMapOf())
 
-data class FriendRelation(val friendId: Long, var since: LocalDate = LocalDate.now())
+data class FriendRelation(@JsonSerialize(using = ToStringSerializer::class) val friendId: ObjectId,
+                          var since: LocalDate = LocalDate.now())
