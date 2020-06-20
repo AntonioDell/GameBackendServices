@@ -1,19 +1,23 @@
 package dell.antonio
 
 import dell.antonio.model.*
-import org.springframework.cloud.netflix.hystrix.*
-import org.springframework.http.*
+import mu.*
+import org.springframework.cloud.circuitbreaker.resilience4j.*
 import org.springframework.stereotype.*
 import org.springframework.web.reactive.function.client.*
 import reactor.core.publisher.*
 
+private val log = KotlinLogging.logger {}
+
 @Service
 class UserFriendsService(val webClientBuilder: WebClient.Builder,
-                         val gameBackendUri: GameBackendUri
+                         val gameBackendUri: GameBackendUri,
+                         @Suppress("SpringJavaInjectionPointsAutowiringInspection")
+                         val circuitBreakerFactory: ReactiveResilience4JCircuitBreakerFactory
 ) {
 
     fun getUserFriends(userId: String): Mono<MutableMap<String, FriendRelation>> {
-        val call = webClientBuilder
+        return webClientBuilder
                 .baseUrl(gameBackendUri.friends.toString())
                 .build()
                 .get()
@@ -21,11 +25,7 @@ class UserFriendsService(val webClientBuilder: WebClient.Builder,
                 .retrieve()
                 .bodyToMono(UserFriends::class.java)
                 .map { it.friends }
-
-        return HystrixCommands.from(call)
-                .fallback(getFallbackUserFriends(userId))
-                .commandName("getUserFriends")
-                .toMono()
+                .transform { circuitBreakerFactory.create("getUserFriends").run(it) { getFallbackUserFriends(userId) } }
     }
 
     fun getFallbackUserFriends(userId: String): Mono<MutableMap<String, FriendRelation>> =

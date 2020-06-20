@@ -22,7 +22,14 @@ import java.time.*
 class UserPageControllerTest(@Autowired val webTestClient: WebTestClient,
                              @Autowired val objectMapper: ObjectMapper) {
     @Autowired
+    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     private lateinit var wireMockServer: WireMockServer
+
+    @Value("\${game-backend-uri.users}")
+    lateinit var usersUrl: String
+
+    @Value("\${game-backend-uri.friends}")
+    lateinit var friendsUrl: String
 
     @AfterEach
     fun afterEach() {
@@ -30,7 +37,7 @@ class UserPageControllerTest(@Autowired val webTestClient: WebTestClient,
     }
 
     private fun stubResponse(url: String, responseBody: JsonNode?, responseStatus: Int = HttpStatus.OK.value()) {
-        wireMockServer.stubFor(get(".**/$url")
+        wireMockServer.stubFor(get(url)
                 .willReturn(
                         aResponse()
                                 .withStatus(responseStatus)
@@ -95,8 +102,8 @@ class UserPageControllerTest(@Autowired val webTestClient: WebTestClient,
         val userFriends = UserFriends(userId, mutableMapOf("friendId" to FriendRelation(
                 "friendId",
                 LocalDate.now().minusMonths(1))))
-        stubResponse("/users/$userId", null, HttpStatus.SERVICE_UNAVAILABLE.value())
-        stubResponse("/friends/$userId", objectMapper.convertValue(userFriends, JsonNode::class.java))
+        stubResponse("$usersUrl/users/$userId", null, HttpStatus.SERVICE_UNAVAILABLE.value())
+        stubResponse("$friendsUrl/friends/$userId", objectMapper.convertValue(userFriends, JsonNode::class.java))
 
         webTestClient.get().uri("/user-page/$userId")
                 .exchange()

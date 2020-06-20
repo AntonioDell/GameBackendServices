@@ -1,8 +1,11 @@
 package dell.antonio
 
 import dell.antonio.model.*
+import mu.*
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.*
+
+
 
 @RestController
 @RequestMapping("/user-page")
@@ -17,7 +20,7 @@ class UserPageController(val userInfoService: UserInfoService,
                     UserPage(userId, it.t1, it.t2)
                 }
 
-        return userPage.defaultIfEmpty(UserPage(userId))
+        return userPage
     }
 
 
