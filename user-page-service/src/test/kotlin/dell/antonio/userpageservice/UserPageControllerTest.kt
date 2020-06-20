@@ -30,7 +30,7 @@ class UserPageControllerTest(@Autowired val webTestClient: WebTestClient,
     }
 
     private fun stubResponse(url: String, responseBody: JsonNode?, responseStatus: Int = HttpStatus.OK.value()) {
-        wireMockServer.stubFor(get(url)
+        wireMockServer.stubFor(get(".**/$url")
                 .willReturn(
                         aResponse()
                                 .withStatus(responseStatus)
@@ -90,7 +90,7 @@ class UserPageControllerTest(@Autowired val webTestClient: WebTestClient,
     }
 
     @Test
-    fun `it creates a user page with default user infos if the user info service is unavailable`() {
+    fun `it creates a user page with empty user infos but friends if only user info service is unavailable`() {
         val userId = "UserId"
         val userFriends = UserFriends(userId, mutableMapOf("friendId" to FriendRelation(
                 "friendId",

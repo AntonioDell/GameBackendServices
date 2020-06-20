@@ -37,7 +37,7 @@ class UserFriendsRepositoryTest(@Autowired val repository: UserFriendsRepository
 
     @Test
     fun findOneByExampleTest() {
-        val userFriends = repository.findOne(Example.of(UserFriends(id1)))
+        val userFriends = repository.findOne(Example.of(UserFriends(id1))).block()
         assertThat(userFriends).isNotNull
     }
 

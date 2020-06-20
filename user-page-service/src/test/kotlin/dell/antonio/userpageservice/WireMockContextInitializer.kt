@@ -22,8 +22,8 @@ class WireMockContextInitializer : ApplicationContextInitializer<ConfigurableApp
         }
 
         TestPropertyValues
-                .of("game-backend-uri.users=http://localhost:${wmServer.port()}/users",
-                        "game-backend-uri.friends=http://localhost:${wmServer.port()}/friends")
+                .of("game-backend-uri.users=http://localhost:${wmServer.port()}",
+                        "game-backend-uri.friends=http://localhost:${wmServer.port()}")
                 .applyTo(applicationContext)
     }
 }

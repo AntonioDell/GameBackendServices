@@ -1,26 +1,22 @@
 package dell.antonio
 
 import dell.antonio.model.*
-import org.springframework.beans.factory.annotation.*
 import org.springframework.cloud.netflix.hystrix.*
 import org.springframework.stereotype.*
 import org.springframework.web.reactive.function.client.*
-import org.springframework.web.util.*
 import reactor.core.publisher.*
 
 @Service
-class UserInfoService(@Autowired val webClientBuilder: WebClient.Builder,
-                      @Autowired val gameBackendUri: GameBackendUri) {
+class UserInfoService(val webClientBuilder: WebClient.Builder,
+                      val gameBackendUri: GameBackendUri) {
 
 
     fun getUserInfo(userId: String): Mono<UserInfo> {
-        val usersUri = UriComponentsBuilder.fromUri(gameBackendUri.users)
-                .pathSegment(userId)
+        val call = webClientBuilder
+                .baseUrl(gameBackendUri.users.toString())
                 .build()
-                .toUri()
-        val call = webClientBuilder.build()
                 .get()
-                .uri(usersUri)
+                .uri("/users/$userId")
                 .retrieve()
                 .bodyToMono(UserInfo::class.java)
         return HystrixCommands.from(call)
