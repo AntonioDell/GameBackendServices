@@ -22,7 +22,7 @@ import java.time.format.*
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = [FriendInfoServiceApplication::class])
 @AutoConfigureWebTestClient
-@DirtiesContext
+//@DirtiesContext
 class FriendControllerTest(@Autowired val client: WebTestClient,
                            @Autowired val repository: UserFriendsRepository,
                            @Autowired val objectMapper: ObjectMapper) {

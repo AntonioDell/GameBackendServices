@@ -9,7 +9,7 @@ import org.springframework.test.annotation.*
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = [FriendInfoServiceApplication::class])
 @AutoConfigureWebTestClient
-@DirtiesContext
+//@DirtiesContext
 class FriendInfoServiceApplicationTests {
 
     @Test
