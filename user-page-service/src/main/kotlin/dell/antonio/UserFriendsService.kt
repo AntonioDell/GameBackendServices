@@ -1,33 +1,33 @@
 package dell.antonio
 
 import dell.antonio.model.*
-import org.springframework.beans.factory.annotation.*
-import org.springframework.cloud.netflix.hystrix.*
+import mu.*
+import org.springframework.cloud.circuitbreaker.resilience4j.*
 import org.springframework.stereotype.*
 import org.springframework.web.reactive.function.client.*
-import org.springframework.web.util.*
 import reactor.core.publisher.*
 
+private val log = KotlinLogging.logger {}
+
 @Service
-class UserFriendsService(@Autowired val webClientBuilder: WebClient.Builder,
-                         @Autowired val gameBackendUri: GameBackendUri) {
+class UserFriendsService(val webClientBuilder: WebClient.Builder,
+                         val gameBackendUri: GameBackendUri,
+                         @Suppress("SpringJavaInjectionPointsAutowiringInspection")
+                         val circuitBreakerFactory: ReactiveResilience4JCircuitBreakerFactory
+) {
 
     fun getUserFriends(userId: String): Mono<MutableMap<String, FriendRelation>> {
-        val friendsUri = UriComponentsBuilder.fromUri(gameBackendUri.friends)
-                .pathSegment(userId)
+
+        return webClientBuilder
+                .baseUrl(gameBackendUri.friends.toString())
                 .build()
-                .toUri()
-        val call = webClientBuilder.build()
                 .get()
-                .uri(friendsUri)
+                .uri("/friends/$userId")
                 .retrieve()
                 .bodyToMono(UserFriends::class.java)
                 .map { it.friends }
+                .transform { circuitBreakerFactory.create("getUserFriends").run(it) { getFallbackUserFriends(userId) } }
 
-        return HystrixCommands.from(call)
-                .fallback(getFallbackUserFriends(userId))
-                .commandName("getUserFriends")
-                .toMono()
     }
 
     fun getFallbackUserFriends(userId: String): Mono<MutableMap<String, FriendRelation>> =

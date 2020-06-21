@@ -11,10 +11,12 @@
         <module name="validation" />
         <module name="firend-info-service" />
         <module name="user-info-service" />
+        <module name="discovery-server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="demo" target="11" />
+      <module name="discovery-server" target="11" />
       <module name="firend-info-service" target="11" />
       <module name="friend-info-service" target="11" />
       <module name="game-backend-services" target="11" />
@@ -26,6 +28,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="demo" options="-parameters" />
+      <module name="discovery-server" options="-parameters" />
       <module name="firend-info-service" options="-parameters" />
       <module name="friend-info-service" options="-parameters" />
       <module name="user-info-service" options="-parameters" />

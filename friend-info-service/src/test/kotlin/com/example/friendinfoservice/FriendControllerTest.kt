@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.*
 import org.springframework.boot.test.autoconfigure.web.reactive.*
 import org.springframework.boot.test.context.*
 import org.springframework.http.*
+import org.springframework.test.annotation.*
 import org.springframework.test.context.junit.jupiter.*
 import org.springframework.test.web.reactive.server.*
 import java.time.*
@@ -21,6 +22,7 @@ import java.time.format.*
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = [FriendInfoServiceApplication::class])
 @AutoConfigureWebTestClient
+//@DirtiesContext
 class FriendControllerTest(@Autowired val client: WebTestClient,
                            @Autowired val repository: UserFriendsRepository,
                            @Autowired val objectMapper: ObjectMapper) {

@@ -1,6 +1,8 @@
 server:
   port: 8103
-
 game-backend-uri:
-  users: http://localhost:8101/users
-  friends: http://localhost:8102/friends
+  users: http://user-info-service
+  friends: http://friend-info-service
+spring:
+  application:
+    name: user-page-service

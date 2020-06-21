@@ -20,15 +20,16 @@ class FriendController(@Autowired val userFriendsRepository: UserFriendsReposito
     @GetMapping("/{id}")
     fun getAllFriends(@PathVariable("id") id: ObjectId,
                       @RequestParam("friendsSince")
-                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) friendsSince: LocalDate? = null) =
-            if (friendsSince != null) {
-                userFriendsRepository.findLatestFriendsSince(id, friendsSince)
-            } else {
-                userFriendsRepository.findById(id)
-            }.defaultIfEmpty(UserFriends(id)).map {
-                it
-            }
-
+                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) friendsSince: LocalDate? = null): Mono<UserFriends> {
+        println("ADA: getAllFriends was called!")
+        return if (friendsSince != null) {
+            userFriendsRepository.findLatestFriendsSince(id, friendsSince)
+        } else {
+            userFriendsRepository.findById(id)
+        }.defaultIfEmpty(UserFriends(id)).map {
+            it
+        }
+    }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)

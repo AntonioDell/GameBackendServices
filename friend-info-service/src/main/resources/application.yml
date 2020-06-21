@@ -1,13 +1,13 @@
-server:
-  port: 8101
 
+server:
+  port: 8102
 
 spring:
   application:
-    name: user-info-service
+    name: friend-info-service
   data:
     mongodb:
       port: 27017
-      database: mongodb
       host: localhost
+      database: mongodb
       version: 4.0.2

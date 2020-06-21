@@ -1,32 +1,30 @@
 package dell.antonio
 
 import dell.antonio.model.*
-import org.springframework.beans.factory.annotation.*
-import org.springframework.cloud.netflix.hystrix.*
+import mu.*
+import org.springframework.cloud.circuitbreaker.resilience4j.*
 import org.springframework.stereotype.*
 import org.springframework.web.reactive.function.client.*
-import org.springframework.web.util.*
 import reactor.core.publisher.*
 
+private val log = KotlinLogging.logger {}
+
 @Service
-class UserInfoService(@Autowired val webClientBuilder: WebClient.Builder,
-                      @Autowired val gameBackendUri: GameBackendUri) {
+class UserInfoService(val webClientBuilder: WebClient.Builder,
+                      val gameBackendUri: GameBackendUri,
+                      @Suppress("SpringJavaInjectionPointsAutowiringInspection")
+                      val circuitBreakerFactory: ReactiveResilience4JCircuitBreakerFactory) {
 
 
     fun getUserInfo(userId: String): Mono<UserInfo> {
-        val usersUri = UriComponentsBuilder.fromUri(gameBackendUri.users)
-                .pathSegment(userId)
+        return webClientBuilder
+                .baseUrl(gameBackendUri.users.toString())
                 .build()
-                .toUri()
-        val call = webClientBuilder.build()
                 .get()
-                .uri(usersUri)
+                .uri("/users/$userId")
                 .retrieve()
                 .bodyToMono(UserInfo::class.java)
-        return HystrixCommands.from(call)
-                .fallback(getFallbackUserInfo(userId))
-                .commandName("getUserInfo")
-                .toMono()
+                .transform { circuitBreakerFactory.create("getUserInfo").run(it) { getFallbackUserInfo(userId) } }
     }
 
     fun getFallbackUserInfo(userId: String) = Mono.just(UserInfo("No user found"))
