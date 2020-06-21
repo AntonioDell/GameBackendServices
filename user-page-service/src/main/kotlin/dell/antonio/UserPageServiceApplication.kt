@@ -18,9 +18,6 @@ import java.time.*
 @ConfigurationPropertiesScan
 @EnableWebFlux
 class UserPageServiceApplication {
-    @Bean
-    @LoadBalanced
-    fun webClientBuilder() = WebClient.builder()
 
     @Bean
     fun defaultCustomizer(): Customizer<ReactiveResilience4JCircuitBreakerFactory> {

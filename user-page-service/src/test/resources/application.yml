@@ -1,0 +1,11 @@
+spring:
+  profiles:
+    active: test
+server:
+  port: 8103
+game-backend-uri.users: http://localhost:${wiremock.server.port}
+game-backend-uri.friends: http://localhost:${wiremock.server.port}
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false

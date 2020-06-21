@@ -17,6 +17,7 @@ class UserFriendsService(val webClientBuilder: WebClient.Builder,
 ) {
 
     fun getUserFriends(userId: String): Mono<MutableMap<String, FriendRelation>> {
+
         return webClientBuilder
                 .baseUrl(gameBackendUri.friends.toString())
                 .build()
@@ -26,6 +27,7 @@ class UserFriendsService(val webClientBuilder: WebClient.Builder,
                 .bodyToMono(UserFriends::class.java)
                 .map { it.friends }
                 .transform { circuitBreakerFactory.create("getUserFriends").run(it) { getFallbackUserFriends(userId) } }
+
     }
 
     fun getFallbackUserFriends(userId: String): Mono<MutableMap<String, FriendRelation>> =
