@@ -8,10 +8,8 @@ import org.springframework.boot.autoconfigure.web.servlet.*
 import org.springframework.boot.context.properties.*
 import org.springframework.cloud.circuitbreaker.resilience4j.*
 import org.springframework.cloud.client.circuitbreaker.*
-import org.springframework.cloud.client.loadbalancer.*
 import org.springframework.context.annotation.*
 import org.springframework.web.reactive.config.*
-import org.springframework.web.reactive.function.client.*
 import java.time.*
 
 @SpringBootApplication(exclude = [WebMvcAutoConfiguration::class])

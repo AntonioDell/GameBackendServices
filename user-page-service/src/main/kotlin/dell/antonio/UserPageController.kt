@@ -1,10 +1,8 @@
 package dell.antonio
 
 import dell.antonio.model.*
-import mu.*
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.*
-
 
 
 @RestController
@@ -14,13 +12,12 @@ class UserPageController(val userInfoService: UserInfoService,
 
     @GetMapping("/{userId}")
     fun getUserPage(@PathVariable("userId") userId: String): Mono<UserPage> {
-        val userPage = userInfoService.getUserInfo(userId)
+
+        return userInfoService.getUserInfo(userId)
                 .zipWith(userFriendsService.getUserFriends(userId))
                 .map {
                     UserPage(userId, it.t1, it.t2)
                 }
-
-        return userPage
     }
 
 

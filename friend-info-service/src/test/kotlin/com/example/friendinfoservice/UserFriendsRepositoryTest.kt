@@ -1,16 +1,5 @@
 package com.example.friendinfoservice
 
-import org.assertj.core.api.Assertions.*
-import org.bson.types.*
-import org.junit.jupiter.api.*
-import org.junit.jupiter.api.extension.*
-import org.springframework.beans.factory.annotation.*
-import org.springframework.boot.test.autoconfigure.data.mongo.*
-import org.springframework.data.domain.*
-import org.springframework.test.context.junit.jupiter.*
-import reactor.core.publisher.*
-import java.time.*
-
 /* TODO: Fix tests
 @DataMongoTest
 @ExtendWith(SpringExtension::class)

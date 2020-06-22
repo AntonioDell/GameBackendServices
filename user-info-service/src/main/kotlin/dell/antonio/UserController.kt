@@ -3,7 +3,6 @@ package dell.antonio
 import dell.antonio.model.*
 import org.bson.types.*
 import org.springframework.beans.factory.annotation.*
-import org.springframework.validation.annotation.*
 import org.springframework.web.bind.annotation.*
 import javax.validation.*
 

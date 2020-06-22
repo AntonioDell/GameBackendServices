@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.*
 import org.springframework.boot.test.autoconfigure.web.reactive.*
 import org.springframework.boot.test.context.*
 import org.springframework.http.*
-import org.springframework.test.annotation.*
 import org.springframework.test.context.junit.jupiter.*
 import org.springframework.test.web.reactive.server.*
 import java.time.*
@@ -146,7 +145,7 @@ class FriendControllerTest(@Autowired val client: WebTestClient,
 
         @Test
         fun `it adds a new friend to an existing repository entity`() {
-            val newFriendId = ObjectId();
+            val newFriendId = ObjectId()
             val friendRelationToAdd = FriendRelation(newFriendId, today)
 
             val addFriendPatch = JsonPatch(listOf(AddOperation(

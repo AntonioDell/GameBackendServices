@@ -6,7 +6,7 @@ import org.springframework.web.reactive.function.client.*
 
 @Configuration
 @Profile("!test")
-class WebClientBuilderConfig{
+class WebClientBuilderConfig {
     @Bean
     @LoadBalanced
     fun webClientBuilder() = WebClient.builder()

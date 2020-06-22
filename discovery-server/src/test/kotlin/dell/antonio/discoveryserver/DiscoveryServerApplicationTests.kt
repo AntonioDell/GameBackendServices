@@ -1,13 +1,13 @@
 package dell.antonio.discoveryserver
 
-import org.junit.jupiter.api.Test
-import org.springframework.boot.test.context.SpringBootTest
+import org.junit.jupiter.api.*
+import org.springframework.boot.test.context.*
 
 @SpringBootTest
 class DiscoveryServerApplicationTests {
 
-	@Test
-	fun contextLoads() {
-	}
+    @Test
+    fun contextLoads() {
+    }
 
 }
