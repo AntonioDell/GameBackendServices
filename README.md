@@ -33,3 +33,6 @@ If you spot any weirdness going on in the code, please feel free to point it out
 I'm grateful for every little thing I can learn.
 
 Ideas for which features would fit in well? More than happy for any suggestions!
+
+You can checkout the [Trello board](https://trello.com/b/2XQ3Fg7A/game-backend-services).
+It isn't always up to date, but it gives a rough idea of where the projects headed.
