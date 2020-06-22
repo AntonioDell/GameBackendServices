@@ -1,7 +1,6 @@
 package dell.antonio.userpageservice
 
 import com.fasterxml.jackson.databind.*
-import com.github.tomakehurst.wiremock.*
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import dell.antonio.*
 import dell.antonio.model.*
@@ -23,25 +22,12 @@ import java.time.*
 @AutoConfigureWebTestClient
 @AutoConfigureWireMock(port = 8104)
 class UserPageControllerTest(@Autowired val client: WebTestClient,
-                             @Autowired val objectMapper: ObjectMapper,
-                             @Autowired val wireMockServer: WireMockServer) {
+                             @Autowired val objectMapper: ObjectMapper) {
 
-    @Value("\${game-backend-uri.users}")
-    lateinit var usersUrl: String
-
-    @Value("\${game-backend-uri.friends}")
-    lateinit var friendsUrl: String
-
-    //lateinit var client: WebClient
-
-    @BeforeEach
-    fun setup() {
-        //client = WebClient.builder().baseUrl(wireMockServer.baseUrl()).build()
-    }
 
     @AfterEach
     fun afterEach() {
-        //reset()
+        reset()
     }
 
     private fun stubResponse(url: String, responseBody: JsonNode?, responseStatus: Int = HttpStatus.OK.value()) {
